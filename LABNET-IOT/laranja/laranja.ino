@@ -4,10 +4,10 @@
 #include <ESP8266WiFi.h>
 
 // WIFI
-const char* ssid     = "labnet (The Lab) ";
+const char* ssid = "labnet (The Lab) ";
 const char* password = "l4bn3t00";
-const char* ssid2    = "hsNCE";
-
+const char* ssid2 = "hsNCE";
+const char* password2 = NULL;
 
 // THINGSPEAK
 WiFiClient  client_thingspeak;
@@ -47,27 +47,6 @@ SimpleTimer timer;
 
 
 
-int connect_wifi(String ssid, String password) {
-  Serial.print("Connecting to: ");
-  Serial.println(ssid);
-  WiFi.begin(ssid, password);
-  int retries = 0;
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    retries++;
-    delay(500);
-    Serial.print(".");
-    if (retries > 20) {
-      return 0;
-    }
-  }
-
-  Serial.println("WiFi connected");
-  Serial.print("IP: ");
-  Serial.println(WiFi.localIP());
-  return 1;
-
-}
 //Serial.println("Tentando conectar");
 //int retries = 0;
 //while (WiFi.status() != WL_CONNECTED) {
@@ -101,7 +80,7 @@ int connect_wifi(String ssid, String password) {
 void setup() {
   Serial.begin(115200);
   pinMode(ONE_WIRE_BUS, INPUT);
-  connect_wifi();
+  connect_wifi(ssid, password);
   timer.setInterval(light_time,      adjust_light);
   timer.setInterval(pump_time,       pump_on);
   timer.setInterval(thingspeak_time, read_water_temperature);
@@ -113,6 +92,32 @@ void loop() {
   yield();
 }
 
+
+
+
+
+void connect_wifi(const char*  s,const char* p) {
+  Serial.print("Connecting to: ");
+  Serial.println(s);
+  WiFi.begin((const char*)s,(const char*)p);
+  int retries = 0;
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    retries++;
+    delay(500);
+    Serial.print(".");
+    if (retries > 20) {
+      connect_wifi(ssid2, password2);
+    }
+  }
+
+  Serial.println("WiFi connected");
+  Serial.print("SSID: ");
+  Serial.println(s);
+  Serial.print("IP: ");
+  Serial.println(WiFi.localIP());
+
+}
 
 
 // Pin Descrição: Brown (VCC) ligado à alimentação positiva, amarelo (OUT) é a saída do sinal, azul (GND) ligado ao negativo da
@@ -147,7 +152,7 @@ void thing(float temp) {
     Serial.println(postStr);
   } else {
     Serial.println("reconectando");
-    connect_wifi();
+    connect_wifi(ssid, password);
   }
 }
 
