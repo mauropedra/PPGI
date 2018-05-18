@@ -84,6 +84,7 @@ void setup() {
   timer.setInterval(light_time,      adjust_light);
   timer.setInterval(pump_time,       pump_on);
   timer.setInterval(thingspeak_time, read_water_temperature);
+  timer.setInterval(1000 * 60 * 15, conecta);
   Serial.println("Setup concluido");
 }
 
@@ -93,32 +94,39 @@ void loop() {
 }
 
 
-
-
-
-void connect_wifi(const char*  s,const char* p) {
-  Serial.print("Connecting to: ");
-  Serial.println(s);
-  WiFi.begin((const char*)s,(const char*)p);
-  int retries = 0;
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    retries++;
-    delay(500);
-    Serial.print(".");
-    if (retries > 20) {
-      connect_wifi(ssid2, password2);
-    }
-  }
-
-  Serial.println("WiFi connected");
-  Serial.print("SSID: ");
-  Serial.println(s);
-  Serial.print("IP: ");
-  Serial.println(WiFi.localIP());
-
+void conecta()
+{
+  connect_wifi(ssid, password);
+  connect_wifi(ssid2, password2);
 }
 
+
+void connect_wifi(const char*  s, const char* p) {
+  if (WiFi.status() != WL_CONNECTED)
+  {
+    Serial.print("Connecting to: ");
+    Serial.println(s);
+    WiFi.begin((const char*)s, (const char*)p);
+    int retries = 0;
+    while (WiFi.status() != WL_CONNECTED)
+    {
+      retries++;
+      delay(500);
+      Serial.print(".");
+      if (retries > 20)
+      {
+        break;
+      }
+    }
+
+    Serial.println("WiFi connected");
+    Serial.print("SSID: ");
+    Serial.println(s);
+    Serial.print("IP: ");
+    Serial.println(WiFi.localIP());
+
+  }
+}
 
 // Pin Descrição: Brown (VCC) ligado à alimentação positiva, amarelo (OUT) é a saída do sinal, azul (GND) ligado ao negativo da
 // fonte de alimentação. A linha preta é uma seleção de nível válida, se estiver conectada a alta ou flutuante, o nível ativo é
